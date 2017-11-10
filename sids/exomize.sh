@@ -10,3 +10,4 @@ for i in *.sid; do
     exomizer mem -l none -o $EXONAME $FILENAME;
     psid64 -c -t blue -p "/home/spider/C64/tools/sidplay26w/sidid.cfg" -v $i;
 done
+cp -f -v *.exo ../exo/
