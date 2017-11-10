@@ -94,12 +94,15 @@ d018_val0           = <(((vidmem0-vicbank)/$400) << 4)+ <(((charset0-vicbank)/$8
 music_init          = $1000
 music_play          = $1003
                     *= sprite_data
-                    !bin "gfx/spider-sprites.spr"
+                    !bin "gfx/spider-sprites.bin"
 spr_lazy:           !bin "gfx/alazyyear.bin"
 spr_myd:            !bin "gfx/myd_big.bin"
 spr_empty:          !fi $40, 0
 spr_lazy_base       = <((spr_lazy-vicbank)/$40)
 spr_myd_base        = <((spr_myd-vicbank)/$40)
+                    *= $3f00
+spr_bot:            !bin "gfx/bottom_squares.bin"
+spr_bot_base        = <((spr_bot-vicbank)/$40)
 ; ==============================================================================
                     *= code_start
                     jmp init_code
@@ -175,11 +178,15 @@ irq2:               ldx #$09
 +                   jsr scroller
                     !if DEBUG=1 { inc $d020 }
                     jsr scroll_colram
-                    !if DEBUG=1 { dec $d020 }
+                    jsr sprites_set_bottom
+                    !if DEBUG=1 {
+                        lda #PURPLE
+                        sta $d020
+                    }
                     lda #1
                     sta irq_ready
                     jmp irq_end
-
+                    !if DEBUG=1 { !align 255, 0 }
 irq3:               ldx #$09
 -                   dex
                     bne -
@@ -872,6 +879,46 @@ sprites_set:        lda #sprite_base
                     rts
 .lazycols:          !byte DARK_GREY, GREY, LIGHT_GREY, YELLOW
                     !byte WHITE, YELLOW, LIGHT_GREY, GREY
+
+                    SPRBOTY = $cc
+
+sprites_set_bottom: lda #spr_bot_base
+                    sta vidmem0+$3f8+4
+                    lda #spr_bot_base+1
+                    sta vidmem0+$3f8+5
+                    lda #spr_bot_base+2
+                    sta vidmem0+$3f8+6
+                    lda #spr_bot_base+3
+                    sta vidmem0+$3f8+7
+                    lda #SPRBOTY
+                    !for i, 0, 3 {
+                        sta $d001+((i+4)*2)
+                    }
+                    lda #$f3
+                    sta $d000+(4*2)
+                    lda #$09
+                    sta $d000+(5*2)
+                    lda #$23
+                    sta $d000+(6*2)
+                    lda #$40
+                    sta $d000+(7*2)
+                    lda #PINK
+                    sta $d027+4
+                    lda #PURPLE
+                    sta $d027+5
+                    lda #LIGHT_GREEN
+                    sta $d027+6
+                    lda #GREEN
+                    sta $d027+7
+                    lda #0
+                    sta $d017
+                    sta $d01c
+                    sta $d01d
+                    lda #%11100000
+                    sta $d010
+                    lda #%11110000
+                    sta $d015
+                    rts
 ; ==============================================================================
 !zone SCROLLER
                     SCROLLER_DELAY      = $ff
