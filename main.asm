@@ -90,9 +90,9 @@ d018_val0           = <(((vidmem0-vicbank)/$400) << 4)+ <(((charset0-vicbank)/$8
 music_init          = $1000
 music_play          = $1003
                     *= sprite_data
-                    !bin "spider-sprite.bin"
-                    !bin "alazyyear.bin"
-spr_myd:            !bin "myd_big.bin"
+                    !bin "gfx/spider-sprite.bin"
+                    !bin "gfx/alazyyear.bin"
+spr_myd:            !bin "gfx/myd_big.bin"
 spr_empty:          !fi $40, 0
 spr_myd_base        = <((spr_myd-vicbank)/$40)
 ; ==============================================================================
