@@ -57,7 +57,7 @@ KEY_CRSRDOWN        = 0x11
 KEY_RETURN          = 0x0D
 KEY_STOP            = 0x03
 
-MARKER_EORVAL       = 0x40
+MARKER_EORVAL       = 0x80
 
 ; ==============================================================================
 zp_start            = 0x02
@@ -106,8 +106,7 @@ spr_myd_base        = <((spr_myd-vicbank)/0x40)
 spr_bot:            !bin "gfx/bottom_squares.bin"
 spr_bot_base        = <((spr_bot-vicbank)/0x40)
                     *= charset0
-                    !fi 0x400, 0x00
-                    !bin "gfx/charset.chr",0x400
+                    !bin "gfx/charset.bin"
 ; ==============================================================================
                     *= code_block02
 fake:               rts
@@ -308,7 +307,7 @@ init_scr_and_songs: lda #COLORBG2
                     sta 0xD800+0x100,x
                     sta 0xD800+0x200,x
                     sta 0xD800+0x2E8,x
-                    lda #(' ' XOR 0x80)
+                    lda #' '
                     sta vidmem0+0x000,x
                     sta vidmem0+0x100,x
                     sta vidmem0+0x200,x
@@ -383,13 +382,13 @@ init_scr_and_songs: lda #COLORBG2
                         sta 0xD800+(4*40)
                     }
                     rts
-.square_tmpl:       !byte 0xE0, 0xE0, 0xE0, 0xE0, 0x20, 0xE0, 0xE0, 0xE0, 0xE0, 0xA0
-                    !byte 0xE0, 0xE0, 0xE0, 0xE0, 0x20, 0xE0, 0xE0, 0xE0, 0xE0, 0xA0
+.square_tmpl:       !byte 0xA0, 0xA0, 0xA0, 0xA0, 0x20, 0xA0, 0xA0, 0xA0, 0xA0, 0x20
+                    !byte 0xA0, 0xA0, 0xA0, 0xA0, 0x20, 0xA0, 0xA0, 0xA0, 0xA0, 0x20
 .sqcol_tmpl:        !byte GREEN, GREEN, GREEN, GREEN, COLORBG1
                     !byte LIGHT_GREEN, LIGHT_GREEN, LIGHT_GREEN, LIGHT_GREEN, COLORBG1
                     !byte PURPLE, PURPLE, PURPLE, PURPLE, COLORBG1
                     !byte PINK, PINK, PINK, PINK, COLORBG1
-time_tmpl:          !scrxor $80, "00:00 / 00:00"
+time_tmpl:          !scr "00:00 / 00:00"
 init_next_tune:     lda #DISABLE
                     sta enable_music
                     sta enable_timer
@@ -524,24 +523,24 @@ timer_increase:     min_cnt_hi = vidmem0+(40*TDISPL_Y)+TDISPL_X+0
                     beq +
                     rts
 +                   lda sec_cnt_lo
-                    cmp #(0x39 XOR 0x80)
+                    cmp #0x39
                     bne ++++
-                    lda #(0x2F XOR 0x80)
+                    lda #0x2F
                     sta sec_cnt_lo
                     lda sec_cnt_hi
-                    cmp #(0x35 XOR 0x80)
+                    cmp #0x35
                     bne +++
-                    lda #(0x2F XOR 0x80)
+                    lda #0x2F
                     sta sec_cnt_hi
                     lda min_cnt_lo
-                    cmp #(0x39 XOR 0x80)
+                    cmp #0x39
                     bne ++
-                    lda #(0x2F XOR 0x80)
+                    lda #0x2F
                     sta min_cnt_lo
                     lda min_cnt_hi
-                    cmp #(0x35 XOR 0x80)
+                    cmp #0x35
                     bne +
-                    lda #(0x2F XOR 0x80)
+                    lda #0x2F
                     sta min_cnt_hi
 +                   inc min_cnt_hi
 ++                  inc min_cnt_lo
@@ -589,7 +588,7 @@ print_snum:         stx .savex+1
                     txa
                     sta ( zp_temp ),y
                     iny
-                    lda #0xA0
+                    lda #0x20
                     sta ( zp_temp ),y
 .savex:             ldx #0
                     rts
@@ -673,7 +672,7 @@ lib_hex2screen:     sta .savea+1
                     lda .hextab,x           ; high nibble
 .low_nibble         ldx #0
                     rts
-.hextab:            !scrxor $80, "0123456789abcdef"
+.hextab:            !scr "0123456789abcdef"
 ; ==============================================================================
                     !zone KEYBOARD
 keyboard_get:       !if DEBUG=1 { dec 0xD020 }
@@ -1073,73 +1072,73 @@ sdata_pt_hi:        !byte >s01_data, >s02_data, >s03_data, >s04_data
 
 s01_data:           !byte <s01_end, >s01_end
                     !byte FLAG_END+FLAG_SW
-                    !scrxor $80, "03:56"
-                    !scrxor $80, "be careful what you wish for, toggle!"
+                    !scr "03:56"
+                    !scr "Be careful what you wish for, Toggle!"
                     !byte 0x00
 s02_data:           !byte <s02_end, >s02_end
                     !byte FLAG_LOOP+FLAG_SW
-                    !scrxor $80, "02:16"
-                    !scrxor $80, "broken hearts & broken speakers"
+                    !scr "02:16"
+                    !scr "Broken Hearts & Broken Speakers"
                     !byte 0x00
 s03_data:           !byte <s03_end, >s03_end
                     !byte FLAG_END+FLAG_SW
-                    !scrxor $80, "03:29"
-                    !scrxor $80, "creation reconciled"
+                    !scr "03:29"
+                    !scr "Creation Reconciled"
                     !byte 0x00
 s04_data:           !byte <s04_end, >s04_end
                     !byte FLAG_END+FLAG_SW
-                    !scrxor $80, "03:02"
-                    !scrxor $80, "dudelking returns"
+                    !scr "03:02"
+                    !scr "Dudelking Returns"
                     !byte 0x00
 s05_data:           !byte <s05_end, >s05_end
                     !byte FLAG_END+FLAG_SW
-                    !scrxor $80, "02:38"
-                    !scrxor $80, "fall is on its way"
+                    !scr "02:38"
+                    !scr "Fall is on its way"
                     !byte 0x00
 s06_data:           !byte <s06_end, >s06_end
                     !byte FLAG_LOOP+FLAG_NT
-                    !scrxor $80, "02:13"
-                    !scrxor $80, "final boss defeated"
+                    !scr "02:13"
+                    !scr "Final Boss Defeated"
                     !byte 0x00
 s07_data:           !byte <s07_end, >s07_end
                     !byte FLAG_END+FLAG_NT
-                    !scrxor $80, "03:08"
-                    !scrxor $80, "grillende zirpe"
+                    !scr "03:08"
+                    !scr "Grillende Zirpe"
                     !byte 0x00
 s08_data:           !byte <s08_end, >s08_end
                     !byte FLAG_LOOP+FLAG_SW
-                    !scrxor $80, "03:26"
-                    !scrxor $80, "groofie neu"
+                    !scr "03:26"
+                    !scr "Groofie Neu"
                     !byte 0x00
 s09_data:           !byte <s09_end, >s09_end
                     !byte FLAG_LOOP+FLAG_SW
-                    !scrxor $80, "03:47"
-                    !scrxor $80, "instrument by accident"
+                    !scr "03:47"
+                    !scr "Instrument by Accident"
                     !byte 0x00
 s10_data:           !byte <s10_end, >s10_end
                     !byte FLAG_LOOP+FLAG_SW
-                    !scrxor $80, "02:51"
-                    !scrxor $80, "piepmatz"
+                    !scr "02:51"
+                    !scr "Piepmatz"
                     !byte 0x00
 s11_data:           !byte <s11_end, >s11_end
                     !byte FLAG_LOOP+FLAG_NT
-                    !scrxor $80, "03:51"
-                    !scrxor $80, "popnudel"
+                    !scr "03:51"
+                    !scr "Popnudel"
                     !byte 0x00
 s12_data:           !byte <s12_end, >s12_end
                     !byte FLAG_END+FLAG_SW
-                    !scrxor $80, "01:55"
-                    !scrxor $80, "schadstoff"
+                    !scr "01:55"
+                    !scr "Schadstoff"
                     !byte 0x00
 s13_data:           !byte <s13_end, >s13_end
                     !byte FLAG_END+FLAG_SW
-                    !scrxor $80, "03:18"
-                    !scrxor $80, "seekrank und skorbut!"
+                    !scr "03:18"
+                    !scr "Seekrank und Skorbut!"
                     !byte 0x00
 s14_data:           !byte <s14_end, >s14_end
                     !byte FLAG_END+FLAG_SW
-                    !scrxor $80, "01:34"
-                    !scrxor $80, "zeckensid"
+                    !scr "01:34"
+                    !scr "ZeckenSID"
                     !byte 0x00
 ; ==============================================================================
                     !zone EXO_DATA
@@ -1165,89 +1164,89 @@ s14_end:
                     !zone SCROLLTEXT
                     *= 0xD000
 scrolltext:
-  !scrxor $80, "oh, what a year. a year of depression, frustration, exhaustion. death "
-  !scrxor $80, "haunting family and friends. age, cancer, suicide. but also a year of "
-  !scrxor $80, "heavy partying, booze brain defragmentation. "
-  !scrxor $80, "full of scene parties, hardcore punk and metal concerts that i enjoyed "
-  !scrxor $80, "with my friends and scene homies. "
-  !scrxor $80, "somehow i managed to put out a lot of sid tunes this year it seems. "
-  !scrxor $80, "i didn't even realize until i started coding this compilation and saw "
-  !scrxor $80, "that i wasn't able to include all my 2017 tunes into a single file. "
-  !scrxor $80, "so i left out all the tiny intro tunes and focused on my party compo "
-  !scrxor $80, "entries and bigger tunes i had lying around on disks / my harddrive. "
-  !scrxor $80, "ram is quite full this time, so unlike my last compilation [godspeed] there was "
-  !scrxor $80, "not much left for the visual part. but i'm not a good designer anyway ;) "
-  !scrxor $80, "okay, let's lean back, listen to ",0xA2,"a lazy year",0xA2," and talk a bit "
-  !scrxor $80, "about the tunes.      "
-  !scrxor $80, 0xA2,"final boss defeated",0xA2," [ninjatracker] was released in our small "
-  !scrxor $80, "5 years mayday! demo. unfortunately we didn't find the time as a group "
-  !scrxor $80, "to release celebrate this year. but as we grew bigger it's not so easy "
-  !scrxor $80, "anymore to get everyone at one table / party. "
-  !scrxor $80, 0xA2,"be careful what you whish for, toggle!",0xA2," [sidwizard] was my first "
-  !scrxor $80, "sid tune remix ever. i've been chatting quite a bit with toggle this year "
-  !scrxor $80, "and he was so kind to send me some of his sources. i think it's always "
-  !scrxor $80, "interesting to see how other musicians do stuff. i at least learned of some "
-  !scrxor $80, "sw commands i never used until working through toggle's tunes. "
-  !scrxor $80, 0xA2,"seekrank und skorbut!",0xA2," [sidwizard] was actually the first tune where "
-  !scrxor $80, "i started heading in that rock / punkrock direction which is music i quite "
-  !scrxor $80, "like and played a lot in real bands and i always wanted to bring into "
-  !scrxor $80, "my sid music. i wrote it last winter after x, but didn't release it until gubbdata 2017. "
-  !scrxor $80, 0xA2,"popnudel",0xA2," [ninjatracker] was remotely released at forever 2017 party. "
-  !scrxor $80, 0xA2,"piepmatz",0xA2," [sidwizard] is one of the unreleased tunes. the middle parts are "
-  !scrxor $80, "heavily influenced by some of the glitch-stuff ",0xA2,"the notwist",0xA2," did when switching "
-  !scrxor $80, "guitars with synths. "
-  !scrxor $80, 0xA2,"groofie neu",0xA2," [sidwizard] is the other unreleased tune. don't ask me why "
-  !scrxor $80, "but i was thinking a lot about simon from delysid when writing this. "
-  !scrxor $80, "he's a very cool, chill person and somehow his nature is reflected in this song. "
-  !scrxor $80, 0xA2,"broken hearts & broken speakers",0xA2," [sidwizard] "
-  !scrxor $80, "was released for ",0xA2,"csdb non standard time signature compo",0xA2,". "
-  !scrxor $80, "as that none standard time signature stuff is usually ruled by all our fellow "
-  !scrxor $80, "jazzy sid musicians and i totally fail in that style i went in a different direction. "
-  !scrxor $80, "my goal was to do a tune which would still be a kind of ",0xA2,"accessible",0xA2," rock tune "
-  !scrxor $80, "despite being ???, well what is it? i don't know, i always get confused if one "
-  !scrxor $80, "should count the 4ths or 8ths or even 16ths or 32ths. "
-  !scrxor $80, 0xA2,"fall is on its way",0xA2," [sidwizard]."
-  !scrxor $80, " i wrote earlier that i came up sw commands i hadn't used before when looking "
-  !scrxor $80, "into toggle's tunes. one of those commands was 03 xx for slow precise sliding. "
-  !scrxor $80, "for some reason i only knew about the short 3f command for instant slide. "
-  !scrxor $80, "this tune is the first where i used my new gained knowledge :) released at zoo 2017. "
-  !scrxor $80, 0xA2,"zeckensid",0xA2," [sidwizard] was originally planned to be released at "
-  !scrxor $80, "revision 2017, but due to one of the above mentioned death strikes in family "
-  !scrxor $80, "i couldn't make it. too make this sound really hardcore actually all intruments have a sustain of 0xf and "
-  !scrxor $80, "i also chose all filters ignoring how crappy it would sound. in the end it didn't "
-  !scrxor $80, "sound as bad as i expected :) it was finally released in berlin at deadline where "
-  !scrxor $80, "i also couldn't attend in person due to family stuff. "
-  !scrxor $80, 0xA2,"instrument by accident",0xA2," [sidwizard]. "
-  !scrxor $80, "the sid musicians also experimenting with sync- and ringmod-bits a lot will "
-  !scrxor $80, "probably understand what the title means. "
-  !scrxor $80, "i usually seldomly use the exact same instruments twice but start from scratch "
-  !scrxor $80, "with every new song i make. of course i know also a lot by heart. "
-  !scrxor $80, "but with sync- ringmod sounds usually this happens: oh, what was that sound i did last time? at this point"
-  !scrxor $80, " imagine me typing in the data as i vaguely remembered. then: that doesn't sound anything "
-  !scrxor $80, "like the last time?!? i could have sworn it's the same wave/pulse table data :) "
-  !scrxor $80, "i really love when the sid starts singing for itself. "
-  !scrxor $80, 0xA2,"grillende zirpe",0xA2," [ninjatracker] "
-  !scrxor $80, "is one of a bunch of ninjatracker tunes i make after i modded this great little "
-  !scrxor $80, "tracker with some convenience features for emulator usage. "
-  !scrxor $80, "unfortunately i had to work a lot in vice this year due to another hardware "
-  !scrxor $80, "blocking my desk. gladly now my real machine is back in place right "
-  !scrxor $80, "next to me. "
-  !scrxor $80, 0xA2,"dudelking returns",0xA2," [sidwizard] "
-  !scrxor $80, "was released at nordlicht 2017. what a great party this was. dancing & drinking the "
-  !scrxor $80, "whole weekend. even a nice ",0xA2,"two stubborn guys do drunk late night discussion about politics",0xA2," "
-  !scrxor $80, "with yazoo. to sum it up: i was right, he was wrong :p "
-  !scrxor $80, 0xA2,"schadstoff",0xA2," [sidwizard] is my personal hardcore punk sid masterpiece "
-  !scrxor $80, "of this year. after beeing still pop compatible with zeckensid i decided to go "
-  !scrxor $80, "completely nuts this time. in fact some people seemed to have liked it. "
-  !scrxor $80, "it did surpringsingly well in the ",0xA2,"mixed oldschool",0xA2," compo at evoke 2017. "
-  !scrxor $80, "but probably also due to the anarchist scrolltext. "
-  !scrxor $80, 0xA2,"creation reconciled",0xA2," [sidwizard] was released at bcc party 2017. "
-  !scrxor $80, "as it was the last party at the old place next to a church i wanted "
-  !scrxor $80, "to release a proper tune with ",0xA2,"goodbye",0xA2,"-feeling. "
-  !scrxor $80, "i always loved to write ",0xA2,"ending",0xA2,"-songs. last songs for an album or "
-  !scrxor $80, "a live gig always fascinate me. "
-  !scrxor $80, "ram is coming to and end. and so is this scroller. "
-  !scrxor $80, "love goes out to all you c64 lunatics. "
-  !scrxor $80, "my friends, take care. this world is a cold place. let's keep each other "
-  !scrxor $80, "warm! love & peace! spider."
-  !byte 0xff
+  !scr "Oh, what a year. A year of depression, frustration, exhaustion. Death "
+  !scr "haunting family and friends. Age, cancer, suicide. But also a year of "
+  !scr "heavy partying, booze brain defragmentation. "
+  !scr "Full of scene parties, hardcore punk and metal concerts that I enjoyed "
+  !scr "with my friends and scene homies. "
+  !scr "Somehow I managed to put out a lot of SID tunes this year it seems. "
+  !scr "I didn't even realize until I started coding this compilation and saw "
+  !scr "that I wasn't able to include all my 2017 tunes into a single file. "
+  !scr "So I left out all the tiny intro tunes and focused on my party compo "
+  !scr "entries and bigger tunes I had lying around on disks / my harddrive. "
+  !scr "RAM is quite full this time, so unlike my last compilation [Godspeed] there was "
+  !scr "not much left for the visual part. But I'm not a good designer anyway ;) "
+  !scr "Okay, let's lean back, listen to ",0x22,"A lazy Year",0x22," and talk a bit "
+  !scr "about the tunes.      "
+  !scr 0x22,"Final Boss Defeated",0x22," [NinjaTracker] was released in our small "
+  !scr "5 years MAYDAY! demo. Unfortunately we didn't find the time as a group "
+  !scr "to release celebrate this year. But as we grew bigger it's not so easy "
+  !scr "anymore to get everyone at one table / party. "
+  !scr 0x22,"Be careful what you whish for, Toggle!",0x22," [SidWizard] was my first "
+  !scr "SID tune remix ever. I've been chatting quite a bit with Toggle this year "
+  !scr "and he was so kind to send me some of his sources. I think it's always "
+  !scr "interesting to see how other musicians do stuff. I at least learned of some "
+  !scr "SW commands I never used until working through Toggle's tunes. "
+  !scr 0x22,"Seekrank und Skorbut!",0x22," [SidWizard] was actually the first tune where "
+  !scr "I started heading in that rock / punkrock direction which is music I quite "
+  !scr "like and played a lot in real bands and I always wanted to bring into "
+  !scr "my SID music. I wrote it last winter after X, but didn't release it until Gubbdata 2017. "
+  !scr 0x22,"Popnudel",0x22," [NinjaTracker] was remotely released at Forever 2017 party. "
+  !scr 0x22,"Piepmatz",0x22," [SidWizard] is one of the unreleased tunes. The middle parts are "
+  !scr "heavily influenced by some of the glitch-stuff ",0x22,"The Notwist",0x22," did when switching "
+  !scr "guitars with synths. "
+  !scr 0x22,"Groofie Neu",0x22," [SidWizard] is the other unreleased tune. Don't ask me why "
+  !scr "but I was thinking a lot about Simon from Delysid when writing this. "
+  !scr "He's a very cool, chill person and somehow his nature is reflected in this song. "
+  !scr 0x22,"Broken Hearts & Broken Speakers",0x22," [SidWizard] "
+  !scr "was released for ",0x22,"CSDb Non Standard Time Signature Compo",0x22,". "
+  !scr "As that none standard time signature stuff is usually ruled by all our fellow "
+  !scr "jazzy SID musicians and I totally fail in that style I went in a different direction. "
+  !scr "My goal was to do a tune which would still be a kind of ",0x22,"accessible",0x22," rock tune "
+  !scr "despite being ???, well what is it? I don't know, I always get confused if one "
+  !scr "should count the 4ths or 8ths or even 16ths or 32ths. "
+  !scr 0x22,"Fall is on its way",0x22," [SidWizard]."
+  !scr " I wrote earlier that I came up SW commands I hadn't used before when looking "
+  !scr "into Toggle's tunes. One of those commands was 03 XX for slow precise sliding. "
+  !scr "For some reason I only knew about the short 3F command for instant slide. "
+  !scr "This tune is the first where I used my new gained knowledge :) Released at Zoo 2017. "
+  !scr 0x22,"ZeckenSID",0x22," [SidWizard] was originally planned to be released at "
+  !scr "Revision 2017, but due to one of the above mentioned death strikes in family "
+  !scr "I couldn't make it. Too make this sound really hardcore actually all intruments have a sustain of $F and "
+  !scr "I also chose all filters ignoring how crappy it would sound. In the end it didn't "
+  !scr "sound as bad as I expected :) It was finally released in Berlin at Deadline where "
+  !scr "I also couldn't attend in person due to family stuff. "
+  !scr 0x22,"Instrument by Accident",0x22," [SidWizard]. "
+  !scr "The SID musicians also experimenting with Sync- and Ringmod-bits a lot will "
+  !scr "probably understand what the title means. "
+  !scr "I usually seldomly use the exact same instruments twice but start from scratch "
+  !scr "with every new song I make. Of course I know also a lot by heart. "
+  !scr "But with Sync- Ringmod sounds usually this happens: Oh, what was that sound I did last time? At this point"
+  !scr " imagine me typing in the data as I vaguely remembered. Then: that doesn't sound anything "
+  !scr "like the last time?!? I could have sworn it's the same wave/pulse table data :) "
+  !scr "I really love when the SID starts singing for itself. "
+  !scr 0x22,"Grillende Zirpe",0x22," [NinjaTracker] "
+  !scr "is one of a bunch of NinjaTracker tunes I make after I modded this great little "
+  !scr "tracker with some convenience features for emulator usage. "
+  !scr "Unfortunately I had to work a lot in VICE this year due to another hardware "
+  !scr "blocking my desk. Gladly now my real machine is back in place right "
+  !scr "next to me. "
+  !scr 0x22,"Dudelking Returns",0x22," [SidWizard] "
+  !scr "was released at Nordlicht 2017. What a great party this was. Dancing & drinking the "
+  !scr "whole weekend. Even a nice ",0x22,"two stubborn guys do drunk late night discussion about politics",0x22," "
+  !scr "with Yazoo. To sum it up: I was right, he was wrong :P "
+  !scr 0x22,"Schadstoff",0x22," [SidWizard] is my personal hardcore punk SID masterpiece "
+  !scr "of this year. After beeing still pop compatible with ZeckenSID I decided to go "
+  !scr "completely nuts this time. In fact some people seemed to have liked it. "
+  !scr "It did surpringsingly well in the ",0x22,"mixed oldschool",0x22," compo at Evoke 2017. "
+  !scr "But probably also due to the anarchist scrolltext. "
+  !scr 0x22,"Creation Reconciled",0x22," [SidWizard] was released at BCC party 2017. "
+  !scr "As it was the last party at the old place next to a church I wanted "
+  !scr "to release a proper tune with ",0x22,"goodbye",0x22,"-feeling. "
+  !scr "I always loved to write ",0x22,"ending",0x22,"-songs. last songs for an album or "
+  !scr "a live gig always fascinate me. "
+  !scr "RAM is coming to and end. And so is this scroller. "
+  !scr "Love goes out to all you C64 lunatics. "
+  !scr "My friends, take care. This world is a cold place. Let's keep each other "
+  !scr "warm! LOVE & PEACE! spider."
+  !byte 0xFF

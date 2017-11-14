@@ -170,7 +170,7 @@
 	marker_pos_lo	= $13
 	spr_lazy_base	= $f3
 	print_colored_line	= $3663	; ?
-	MARKER_EORVAL	= $40
+	MARKER_EORVAL	= $80
 	SPIDERDELAY	= $77
 	exod_get_bits	= $414e	; ?
 	marker_pos_hi	= $14
