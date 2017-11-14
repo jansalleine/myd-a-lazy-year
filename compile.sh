@@ -11,5 +11,5 @@ exomizer sfx 0x$STARTADDR -s "lda #\$0b sta \$d011" -x3 -o "$OUTFILE" out.prg
 rm -f out.prg
 #rm -f labels.asm
 
-x64sc -VICIIborders 2 "$OUTFILE"
-#codenet -n 172.16.1.164 -x "$OUTFILE"
+#x64sc -VICIIborders 2 "$OUTFILE"
+codenet -n 172.16.1.164 -x "$OUTFILE"
