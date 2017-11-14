@@ -434,6 +434,8 @@ init_next_tune:     lda #DISABLE
                     sta enable_music
                     sta enable_timer
                     sta enable_timer_check
+                    lda #50
+                    sta framecounter
                     lda #0
                     sta new_song
                     rts
@@ -531,7 +533,7 @@ timer_increase:     min_cnt_hi = vidmem0+(40*TDISPL_Y)+TDISPL_X+0
                     min_cnt_lo = vidmem0+(40*TDISPL_Y)+TDISPL_X+1
                     sec_cnt_hi = vidmem0+(40*TDISPL_Y)+TDISPL_X+3
                     sec_cnt_lo = vidmem0+(40*TDISPL_Y)+TDISPL_X+4
-                    dec .framecounter
+                    dec framecounter
                     beq +
                     rts
 +                   lda sec_cnt_lo
@@ -559,9 +561,9 @@ timer_increase:     min_cnt_hi = vidmem0+(40*TDISPL_Y)+TDISPL_X+0
 +++                 inc sec_cnt_hi
 ++++                inc sec_cnt_lo
                     lda #50
-                    sta .framecounter
+                    sta framecounter
                     rts
-.framecounter:      !byte 50
+framecounter:       !byte 50
 timer_check:        min_end_hi = vidmem0+(40*TDISPL_Y)+TDISPL_X+8
                     min_end_lo = vidmem0+(40*TDISPL_Y)+TDISPL_X+9
                     sec_end_hi = vidmem0+(40*TDISPL_Y)+TDISPL_X+11
