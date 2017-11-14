@@ -116,7 +116,10 @@ irq:                pha
                     pha
                     tya
                     pha
-
+                    lda 0x01
+                    sta .save01+1
+                    lda #0x35
+                    sta 0x01
                     lda 0xD012
 -                   cmp 0xD012
                     beq -
@@ -137,6 +140,8 @@ irq_end:            ldx #0
                     lda #0
                     sta irq_end+1
 +                   asl 0xD019
+.save01:            lda #0x35
+                    sta 0x01
                     pla
                     tay
                     pla
@@ -189,7 +194,7 @@ irq2:               ldx #0x09
                     lda #1
                     sta irq_ready
                     jmp irq_end
-                    !if DEBUG=1 { !align 255, 0 }
+                    !if DEBUG=1 { !align 255, 0, 0 }
 irq3:               ldx #0x09
 -                   dex
                     bne -
@@ -215,15 +220,10 @@ irq3:               ldx #0x09
                     dey                     ;2
                     beq --                  ;2 / 3 _61 (+2)
                     bne -                   ;3     _63
-+                   lda 0xD016
-                    and #%11110000
-d016_bits012:       ora #0
++
+d016_bits012:       lda #0
                     sta 0xD016
                     jmp irq_end
-
-irq_tab_lo:         !byte <irq1, <irq2, <irq3
-irq_tab_hi:         !byte >irq1, >irq2, >irq3
-irq_lines:          !byte LINE1, 0x59, 0xE1
 
 .raster1:           !byte COLORBG1, COLORBG2, COLORBG1, COLORBG1
                     !byte COLORBG2, COLORBG1, COLORBG2, COLORBG2
@@ -234,6 +234,10 @@ irq_lines:          !byte LINE1, 0x59, 0xE1
                     !byte COLORBG2, COLORBG2, COLORBG2, COLORBG1
                     !byte COLORBG2, COLORBG2, COLORBG1, COLORBG2
                     !byte COLORBG1, COLORBG1, COLORBG2, COLORBG1
+
+irq_tab_lo:         !byte <irq1, <irq2, <irq3
+irq_tab_hi:         !byte >irq1, >irq2, >irq3
+irq_lines:          !byte LINE1, 0x59, 0xE1
 ; ==============================================================================
                     !zone DECRUNCH
 exod_addr:          !src "inc/wrap.asm"
