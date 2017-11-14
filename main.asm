@@ -83,7 +83,7 @@ marker_song         = marker_pos_hi+1
 getin               = 0xFFE4
 keyscan             = 0xEA87
 
-code_start          = 0x3342
+code_start          = 0x3332
 code_block02        = 0x4000
 data_block01        = 0x42EA
 data_block02        = 0xE5D0
@@ -106,7 +106,7 @@ spr_myd_base        = <((spr_myd-vicbank)/0x40)
 spr_bot:            !bin "gfx/bottom_squares.bin"
 spr_bot_base        = <((spr_bot-vicbank)/0x40)
                     *= charset0
-                    !bin "gfx/charset.bin"
+                    !bin "gfx/charset.chr"
 ; ==============================================================================
                     *= code_block02
 fake:               rts
@@ -313,6 +313,14 @@ init_scr_and_songs: lda #COLORBG2
                     sta vidmem0+0x200,x
                     sta vidmem0+0x2E8,x
                     inx
+                    bne -
+                    ldx #96
+-                   txa
+                    sta vidmem0+(4*40)-96,x
+                    lda #COLORSCROLL
+                    sta 0xD800+(4*40)-96,x
+                    inx
+                    cpx #124
                     bne -
                     lda #<vidmem0+(40*DISPLAY_START_Y)+DISPLAY_START_X
                     sta marker_pos_lo
