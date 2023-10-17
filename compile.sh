@@ -1,5 +1,5 @@
 #!/bin/sh
-OUTFILE="${PWD##*/}".prg
+OUTFILE="a lazy year".prg
 
 rm -f "$OUTFILE"
 
